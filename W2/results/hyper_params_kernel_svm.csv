@@ -1,0 +1,6 @@
+SVM Kernel,Mean accuracy,Std accuracy
+linear,0.800467,0.031143
+poly,0.0.789024,0.030563
+rbf,0.839045,0.021455
+sigmoid,0.838135,0.021336
+histogram_intersection,0.833252,0.023525
