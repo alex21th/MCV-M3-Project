@@ -1,0 +1,7 @@
+,Descriptor,Pyramid level,Codebook size,Step size,PCA perc,Pyramid region,Norm,Accuracy
+0,DENSE SIFT,1,500,12,1,horizontal,l2,0.8430666245943021
+1,DENSE SIFT,1,500,12,1,horizontal,power,0.839343220338983
+2,DENSE SIFT,1,500,12,1,horizontal,scaler,0.8388225748287054
+3,DENSE SIFT,2,500,12,1,horizontal,l2,0.837747475658132
+4,DENSE SIFT,2,500,12,1,horizontal,power,0.8393387125856473
+5,DENSE SIFT,2,500,12,1,horizontal,scaler,0.8345785250631086
