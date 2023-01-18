@@ -2,3 +2,6 @@
 .gitignore
 W2/scripts/__pycache__/gridsearch_svm.cpython-310.pyc
 W2/scripts/__pycache__/utils.cpython-310.pyc
+W3/src/__pycache__/dataloader.cpython-310.pyc
+W3/src/__pycache__/mlp.cpython-310.pyc
+W3/src/__pycache__/utils.cpython-310.pyc
