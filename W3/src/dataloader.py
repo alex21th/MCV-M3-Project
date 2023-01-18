@@ -1,5 +1,5 @@
 import os
-from utils import *
+#from utils import *
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Reshape
 from keras.preprocessing.image import ImageDataGenerator

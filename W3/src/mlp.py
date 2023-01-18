@@ -51,7 +51,7 @@ def mlp_five_layers(input_shape: Tuple[int, int, int], output_shape: int, model:
     model.add(Flatten(input_shape = (input_shape[0], input_shape[1], input_shape[2])))
     model.add(Dense(units=4092, activation='relu', name='first'))
     model.add(Dense(units=2048, activation='relu', name='second'))
-
+    model.add(Dropout (0.2))
     model.add(Dense(units=1024, activation='relu', name='third'))
     model.add(Dense(units=256, activation='relu', name='fourth'))
     model.add(Dense(units=64, activation='relu', name='fifth'))

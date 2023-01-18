@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 from mlp import get_mlp
 from keras.callbacks import EarlyStopping
 from dataloader import get_train_dataloader, get_val_dataloader
+from plotting import Plot
+import os
 
 def parse_args():
     parser = ArgumentParser()
@@ -31,7 +33,7 @@ def __main__():
     experiment_path = f"{output_dir}/{model}-{input_size}-{batch_size}-{lr}"
     model_name = experiment_path + "/weights.h5"
     plots_folder = experiment_path + '/plots'
-
+    os.makedirs(plots_folder, exist_ok=True)
 
     
     train_dataloader = get_train_dataloader(PATCH_SIZE=64, BATCH_SIZE=batch_size ,directory = args.data_dir)
@@ -53,9 +55,9 @@ def __main__():
         verbose=1,
     )
 
-
+    
     print('\nFinished :)')
-
+    Plot(history=model.history, path = plots_folder)
 
 
 if __name__ == "__main__":
