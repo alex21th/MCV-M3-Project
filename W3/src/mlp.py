@@ -1,9 +1,10 @@
 from typing import Tuple
 from keras.layers import Reshape, Dense, Dropout, Activation, Flatten
 from tensorflow.python.keras import Sequential
-from dataloader import get_train_dataloader, get_val_dataloader
 
-def get_mlp(input_shape: Tuple[int, int, int] = (32, 32, 3), output_shape: int = 8, model_name: str = 'mlp_baseline') -> Sequential:
+
+def get_mlp(input_shape: Tuple[int, int, int] = (32, 32, 3), output_shape: int = 8,
+            model_name: str = 'mlp_baseline') -> Sequential:
     """
     This function returns a Keras Sequential model based on the model name.
 
@@ -45,7 +46,6 @@ def mlp_five_layers(input_shape: Tuple[int, int, int], output_shape: int, model:
     :param output_shape: Integer with the output neurons
     :return:
     """
-
 
     model = Sequential()
     model.add(Flatten(input_shape = (input_shape[0], input_shape[1], input_shape[2])))
