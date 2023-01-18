@@ -19,6 +19,7 @@ def get_train_dataloader(directory: str, patch_size: int, batch_size: int):
         classes=['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding'],
         class_mode='categorical')  # since we use binary_crossentropy loss, we need categorical labels
     return train_generator
+    
 
 
 def get_val_dataloader(directory: str, patch_size: int, batch_size: int) -> ImageDataGenerator:

@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 from src.mlp import get_mlp
 from keras.callbacks import EarlyStopping
 from src.dataloader import get_train_dataloader, get_val_dataloader
+from src.plotting import Plot
+import os
 
 
 def parse_args():
@@ -37,6 +39,8 @@ def main():
 
     train_dataloader = get_train_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
     val_dataloader = get_val_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
+    plots_folder = "W3/results/plots/"
+    os.makedirs(plots_folder, exist_ok=True)
 
     metrics = 'accuracy'
     loss = 'categorical_crossentropy'
@@ -50,11 +54,12 @@ def main():
         epochs=epochs,
         # callbacks=es,
         validation_data=val_dataloader,
-        validation_steps=0 if val_dataloader is None else len(train_dataloader),
+        validation_steps=0 if val_dataloader is None else len(val_dataloader),
         verbose=1,
     )
 
     print('\nFinished :)')
+    Plot(history=model.history, path = plots_folder)
 
 
 if __name__ == "__main__":
