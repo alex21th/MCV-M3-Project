@@ -32,7 +32,7 @@ def __main__():
     )
     experiment_path = f"{output_dir}/{model}-{input_size}-{batch_size}-{lr}"
     model_name = experiment_path + "/weights.h5"
-    plots_folder = experiment_path + '/plots'
+    plots_folder = "W3/results/plots/"
     os.makedirs(plots_folder, exist_ok=True)
 
     
