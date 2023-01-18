@@ -13,7 +13,7 @@ def parse_args():
     parser.add_argument("-b", "--batch_size", type=int, default=32)
     parser.add_argument("-out", "--output_dir", type=str, default="results/")
     parser.add_argument("-m", "--model", type=str, default="mlp_five_layers")
-    parser.add_argument("-in", "--input_size", type=str, default=32)
+    parser.add_argument("-in", "--input_size", type=int, default=32)
     return parser.parse_args()
 
 def __main__():
@@ -27,7 +27,7 @@ def __main__():
     
     model = get_mlp(
         model_name=model_args,
-        #input_shape=(32, 32, 3)
+        input_shape=(input_size, input_size, 3)
         #output_shape = #nr of classes
     )
     experiment_path = f"{output_dir}/{model}-{input_size}-{batch_size}-{lr}"
@@ -36,12 +36,12 @@ def __main__():
     os.makedirs(plots_folder, exist_ok=True)
 
     
-    train_dataloader = get_train_dataloader(PATCH_SIZE=64, BATCH_SIZE=batch_size ,directory = args.data_dir)
-    val_dataloader = get_val_dataloader(PATCH_SIZE=64, BATCH_SIZE=batch_size ,directory = args.data_dir)
+    train_dataloader = get_train_dataloader(PATCH_SIZE=input_size, BATCH_SIZE=batch_size ,directory = args.data_dir)
+    val_dataloader = get_val_dataloader(PATCH_SIZE=input_size, BATCH_SIZE=batch_size ,directory = args.data_dir)
     
     metrics = 'accuracy'
     loss = 'categorical_crossentropy'
-    model.compile(optimizer='sgd', loss=loss, metrics=metrics)
+    model.compile(optimizer='sgd', loss=loss, metrics=metrics, learning_rate=lr)
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1)
 
     # Train model
