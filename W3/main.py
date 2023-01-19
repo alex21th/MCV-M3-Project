@@ -28,7 +28,6 @@ def main():
     model_name = args.model
     data_dir = args.data_dir
 
-
     experiment_path = f"{output_dir}{model_name}-{input_size}-{batch_size}-{lr}"
     model_path = experiment_path + "weights.h5"
     plots_folder = experiment_path + '/plots'
@@ -39,7 +38,6 @@ def main():
         input_shape=(input_size, input_size, 3),
         output_shape=8
     )
-
 
     train_dataloader = get_train_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
     val_dataloader = get_val_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)

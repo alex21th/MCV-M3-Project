@@ -1,7 +1,8 @@
 from keras.preprocessing.image import ImageDataGenerator
+from keras_preprocessing.image import DirectoryIterator
 
 
-def get_train_dataloader(directory: str, patch_size: int, batch_size: int):
+def get_train_dataloader(directory: str, patch_size: int, batch_size: int) -> DirectoryIterator:
     """
     Returns a dataloader for the training set
     :param directory: path directory of the dataset
@@ -22,7 +23,7 @@ def get_train_dataloader(directory: str, patch_size: int, batch_size: int):
     return train_generator
 
 
-def get_val_dataloader(directory: str, patch_size: int, batch_size: int) -> ImageDataGenerator:
+def get_val_dataloader(directory: str, patch_size: int, batch_size: int) -> DirectoryIterator:
     """
     Returns a dataloader for the validation set
     :param directory: path directory of the dataset
