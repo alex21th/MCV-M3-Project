@@ -1,19 +1,19 @@
 from argparse import ArgumentParser
-from mlp import get_mlp
+from src.mlp import get_mlp
 from keras.callbacks import EarlyStopping
-from dataloader import get_train_dataloader, get_val_dataloader
-from plotting import Plot
+from src.dataloader import get_train_dataloader, get_val_dataloader
+from src.plotting import plot_metrics_and_losses
 import os
-import tensorflow as tf
+
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("-d", "--data_dir", type=str, default="MIT_split")  # static
+    parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split")  # static
     parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
-    parser.add_argument("-e", "--epochs", type=int, default=10)
-    parser.add_argument("-b", "--batch_size", type=int, default=32)
+    parser.add_argument("-e", "--epochs", type=int, default=100)
+    parser.add_argument("-b", "--batch_size", type=int, default=256)
     parser.add_argument("-out", "--output_dir", type=str, default="results/")
-    parser.add_argument("-m", "--model", type=str, default="mlp_five_layers")
+    parser.add_argument("-m", "--model", type=str, default="mlp_baseline")
     parser.add_argument("-in", "--input_size", type=int, default=32)
     return parser.parse_args()
 
@@ -25,23 +25,25 @@ def main():
     epochs = args.epochs
     batch_size = args.batch_size
     output_dir = args.output_dir
-    model_args = args.model
+    model_name = args.model
     data_dir = args.data_dir
 
+
+    experiment_path = f"{output_dir}{model_name}-{input_size}-{batch_size}-{lr}"
+    model_path = experiment_path + "weights.h5"
+    plots_folder = experiment_path + '/plots'
+    os.makedirs(plots_folder, exist_ok=True)
+
     model = get_mlp(
-        model_name=model_args,
+        model_name=model_name,
         input_shape=(input_size, input_size, 3),
         output_shape=8
     )
-    experiment_path = f"{output_dir}/{model}-{input_size}-{batch_size}-{lr}"
-    model_name = experiment_path + "/weights.h5"
-    plots_folder = experiment_path + '/plots'
+
 
     train_dataloader = get_train_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
     val_dataloader = get_val_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
-    plots_folder = "W3/results/plots/"
-    os.makedirs(plots_folder, exist_ok=True)
-    
+
     metrics = 'accuracy'
     loss = 'categorical_crossentropy'
 
@@ -60,7 +62,7 @@ def main():
     )
 
     print('\nFinished :)')
-    Plot(history=model.history, path = plots_folder)
+    plot_metrics_and_losses(history=model.history, path=plots_folder)
 
 
 if __name__ == "__main__":

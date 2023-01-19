@@ -37,7 +37,7 @@ def mlp_baseline(input_shape: Tuple[int, int, int] = (32, 32, 3), output_shape: 
     return model
 
 
-def mlp_five_layers(input_shape: Tuple[int, int, int], output_shape: int, model: str = 'mlp_baseline') -> Sequential:
+def mlp_five_layers(input_shape: Tuple[int, int, int], output_shape: int) -> Sequential:
     """
     This function returns a Keras Sequential model based on the model name.
 
@@ -48,13 +48,13 @@ def mlp_five_layers(input_shape: Tuple[int, int, int], output_shape: int, model:
     """
 
     model = Sequential()
-    model.add(Flatten(input_shape = (input_shape[0], input_shape[1], input_shape[2])))
-    #model.add(Dense(units=8184, activation='relu', name='first'))
-    #model.add(Dropout (0.2))
-    #model.add(Dense(units=4092, activation='relu', name='second'))
-    #model.add(Dropout (0.2))
+    model.add(Flatten(input_shape=(input_shape[0], input_shape[1], input_shape[2])))
+    # model.add(Dense(units=8184, activation='relu', name='first'))
+    # model.add(Dropout (0.2))
+    # model.add(Dense(units=4092, activation='relu', name='second'))
+    # model.add(Dropout (0.2))
     model.add(Dense(units=2048, activation='relu', name='third'))
-    model.add(Dropout (0.2))
+    model.add(Dropout(0.2))
     model.add(Dense(units=1024, activation='relu', name='fourth'))
     model.add(Dense(units=512, activation='relu', name='fifth'))
     model.add(Dense(units=128, activation='relu', name='sixth'))

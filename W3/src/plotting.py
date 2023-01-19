@@ -1,6 +1,13 @@
 from matplotlib import pyplot as plt
 
-def Plot(history, path):
+
+def plot_metrics_and_losses(history, path):
+    """
+    Plots the metrics and losses of the model
+    :param history: history of the model
+    :param path: path to save the plots
+    """
+
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
@@ -10,6 +17,7 @@ def Plot(history, path):
     plt.legend(['train', 'validation'], loc='upper left')
     plt.savefig(path + 'accuracy.jpg')
     plt.close()
+
     # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
