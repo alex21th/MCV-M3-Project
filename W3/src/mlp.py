@@ -1,5 +1,5 @@
 from typing import Tuple
-from keras.layers import Reshape, Dense, Dropout, Activation, Flatten
+from keras.layers import Reshape, Dense, Dropout, Flatten
 from tensorflow.python.keras import Sequential
 
 
@@ -41,7 +41,6 @@ def mlp_five_layers(input_shape: Tuple[int, int, int], output_shape: int) -> Seq
     """
     This function returns a Keras Sequential model based on the model name.
 
-    :param model: String with the model name
     :param input_shape: Tuple with the input shape
     :param output_shape: Integer with the output neurons
     :return:

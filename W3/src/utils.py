@@ -11,6 +11,7 @@ def softmax(x):
     return e_x / e_x.sum(axis=0)
 
 
+# TODO: Do something with this
 def generate_image_patches_db(in_directory, out_directory, patch_size=64):
     if not os.path.exists(out_directory):
         os.makedirs(out_directory)

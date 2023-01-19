@@ -15,6 +15,7 @@ def parse_args():
     parser.add_argument("-out", "--output_dir", type=str, default="results/")
     parser.add_argument("-m", "--model", type=str, default="mlp_baseline")
     parser.add_argument("-in", "--input_size", type=int, default=32)
+    parser.add_argument("-opt", "--optimizer", type=str, default='adam')
     return parser.parse_args()
 
 
@@ -27,8 +28,9 @@ def main():
     output_dir = args.output_dir
     model_name = args.model
     data_dir = args.data_dir
+    optimizer_name = args.optimizer
 
-    experiment_path = f"{output_dir}{model_name}-{input_size}-{batch_size}-{lr}"
+    experiment_path = f"{output_dir}{model_name}-{input_size}-{batch_size}-{lr}-{optimizer_name}"
     model_path = experiment_path + "/weights.h5"
     plots_folder = experiment_path + '/plots/'
     os.makedirs(plots_folder, exist_ok=True)
@@ -45,7 +47,8 @@ def main():
     metrics = 'accuracy'
     loss = 'categorical_crossentropy'
 
-    model.compile(optimizer='sgd', loss=loss, metrics=metrics)
+    # TODO: add optimizer with a lr scheduler (first the lr_scheduler, then the optimizer)
+    model.compile(optimizer=optimizer_name, loss=loss, metrics=metrics)
     callbacks = get_callbacks(model_path, es_use=True, es_patience=15)
 
     # Train model
