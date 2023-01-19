@@ -1,14 +1,14 @@
 from argparse import ArgumentParser
-from src.mlp import get_mlp
+from mlp import get_mlp
 from keras.callbacks import EarlyStopping
-from src.dataloader import get_train_dataloader, get_val_dataloader
-from src.plotting import Plot
+from dataloader import get_train_dataloader, get_val_dataloader
+from plotting import Plot
 import os
-
+import tensorflow as tf
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split")  # static
+    parser.add_argument("-d", "--data_dir", type=str, default="MIT_split")  # static
     parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
     parser.add_argument("-e", "--epochs", type=int, default=10)
     parser.add_argument("-b", "--batch_size", type=int, default=32)
@@ -41,14 +41,11 @@ def main():
     val_dataloader = get_val_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
     plots_folder = "W3/results/plots/"
     os.makedirs(plots_folder, exist_ok=True)
-
-    
-    train_dataloader = get_train_dataloader(PATCH_SIZE=input_size, BATCH_SIZE=batch_size ,directory = args.data_dir)
-    val_dataloader = get_val_dataloader(PATCH_SIZE=input_size, BATCH_SIZE=batch_size ,directory = args.data_dir)
     
     metrics = 'accuracy'
     loss = 'categorical_crossentropy'
-    model.compile(optimizer='sgd', loss=loss, metrics=metrics, learning_rate=lr)
+
+    model.compile(optimizer='sgd', loss=loss, metrics=metrics)
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1)
 
     # Train model
