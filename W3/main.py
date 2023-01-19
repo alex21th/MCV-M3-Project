@@ -1,8 +1,8 @@
 from argparse import ArgumentParser
 from src.mlp import get_mlp
-from keras.callbacks import EarlyStopping
 from src.dataloader import get_train_dataloader, get_val_dataloader
 from src.plotting import plot_metrics_and_losses
+from src.callbacks import get_callbacks
 import os
 
 
@@ -10,8 +10,8 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split")  # static
     parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
-    parser.add_argument("-e", "--epochs", type=int, default=100)
-    parser.add_argument("-b", "--batch_size", type=int, default=256)
+    parser.add_argument("-e", "--epochs", type=int, default=50)
+    parser.add_argument("-b", "--batch_size", type=int, default=64)
     parser.add_argument("-out", "--output_dir", type=str, default="results/")
     parser.add_argument("-m", "--model", type=str, default="mlp_baseline")
     parser.add_argument("-in", "--input_size", type=int, default=32)
@@ -29,8 +29,8 @@ def main():
     data_dir = args.data_dir
 
     experiment_path = f"{output_dir}{model_name}-{input_size}-{batch_size}-{lr}"
-    model_path = experiment_path + "weights.h5"
-    plots_folder = experiment_path + '/plots'
+    model_path = experiment_path + "/weights.h5"
+    plots_folder = experiment_path + '/plots/'
     os.makedirs(plots_folder, exist_ok=True)
 
     model = get_mlp(
@@ -46,14 +46,14 @@ def main():
     loss = 'categorical_crossentropy'
 
     model.compile(optimizer='sgd', loss=loss, metrics=metrics)
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1)
+    callbacks = get_callbacks(model_path, es_use=True, es_patience=15)
 
     # Train model
     model.fit(
         x=train_dataloader,
         steps_per_epoch=len(train_dataloader),
         epochs=epochs,
-        # callbacks=es,
+        callbacks=callbacks,
         validation_data=val_dataloader,
         validation_steps=0 if val_dataloader is None else len(val_dataloader),
         verbose=1,
