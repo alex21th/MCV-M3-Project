@@ -1,4 +1,7 @@
 from argparse import ArgumentParser
+
+from keras.utils.vis_utils import plot_model
+
 from src.mlp import get_mlp
 from src.dataloader import get_train_dataloader, get_val_dataloader
 from src.plotting import plot_metrics_and_losses
@@ -40,6 +43,8 @@ def main():
         input_shape=(input_size, input_size, 3),
         output_shape=8
     )
+
+    plot_model(model, to_file=plots_folder + 'modelMLP.png', show_shapes=True, show_layer_names=True)
 
     train_dataloader = get_train_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
     val_dataloader = get_val_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
