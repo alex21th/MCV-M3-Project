@@ -1,6 +1,6 @@
 from typing import Tuple
-from keras.layers import Reshape, Dense, Dropout, Flatten
-from tensorflow.python.keras import Sequential
+from tensorflow.keras.layers import Reshape, Dense, Dropout, Flatten
+from tensorflow.keras.models import Sequential
 
 
 def get_mlp(input_shape: Tuple[int, int, int] = (32, 32, 3), output_shape: int = 8,
@@ -30,8 +30,8 @@ def mlp_baseline(input_shape: Tuple[int, int, int] = (32, 32, 3), output_shape: 
             input_shape=input_shape,
             name='first')
     )
-    model.add(Dense(units=2048, activation='relu', name='first'))
-    model.add(Dense(units=1024, activation='relu'))
+    model.add(Dense(units=2048, activation='relu', name='second'))
+    model.add(Dense(units=1024, activation='relu', name='third'))
     model.add(Dense(units=output_shape, activation='softmax'))
 
     return model

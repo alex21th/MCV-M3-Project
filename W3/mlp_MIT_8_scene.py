@@ -1,7 +1,7 @@
 import os
 import getpass
 
-from utils import *
+from src.utils import *
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Flatten, Dense, Reshape
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
