@@ -14,7 +14,7 @@ def get_callbacks(model_path: str, experiment_path: str, es_use: bool = True, es
     callbacks = [
         get_model_checkpoint_callback(model_path),
         get_early_stopping(es_use, es_patience),
-        CSVLogger(experiment_path + 'log.csv', append=True, separator=';')
+        CSVLogger(experiment_path + '/log.csv', append=True, separator=';')
     ]
     return callbacks
 

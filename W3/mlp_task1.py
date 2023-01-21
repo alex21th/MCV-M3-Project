@@ -14,7 +14,7 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split")  # static
     parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
-    parser.add_argument("-e", "--epochs", type=int, default=40)
+    parser.add_argument("-e", "--epochs", type=int, default=2)
     parser.add_argument("-b", "--batch_size", type=int, default=8)
     parser.add_argument("-out", "--output_dir", type=str, default="results/")
     parser.add_argument("-m", "--model", type=str, default="mlp_baseline")
@@ -70,7 +70,7 @@ def main():
     callbacks = get_callbacks(best_model_path, experiment_path, es_use=True, es_patience=15)
 
     # Train model
-    model.fit(
+    history = model.fit(
         x=train_dataloader,
         steps_per_epoch=len(train_dataloader),
         epochs=epochs,
@@ -82,7 +82,7 @@ def main():
     )
 
     print('\nFinished :)')
-    plot_metrics_and_losses(history=model.history, path=plots_folder)
+    plot_metrics_and_losses(history=history, path=plots_folder)
     model.load_weights(best_model_path)
     res = model.evaluate(val_dataloader, verbose=1)
     return res
@@ -91,7 +91,8 @@ def main():
 if __name__ == "__main__":
     prepare_gpu()
     args = parse_args()
-
+    
+    results = []
     for i_size in [16, 32, 64]:
         args.input_size = i_size
         for lr in [0.001, 0.005]:
@@ -100,4 +101,10 @@ if __name__ == "__main__":
                 args.optimizer = opt
                 for batch_size in [8, 16, 32]:
                     args.batch_size = batch_size
-                    main()
+                    res_eval = main()
+                    result = [args.model, i_size, lr, opt, batch_size, res_eval]
+                    results.append(result)
+
+    df = pd.DataFrame(results, columns=['Model', 'Input size', 'Learning rate',
+                                        'Optimizer', 'Batch size', 'Best val. accuracy'])
+    df.to_csv(os.path.join(args.output_dir, 'mlp_task1_results.csv'))

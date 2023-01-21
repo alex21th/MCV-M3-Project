@@ -1,117 +1,108 @@
 from argparse import ArgumentParser
 
+import pandas as pd
+from keras import Model
+from sklearn import svm
+from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.utils import plot_model
-
-from src.svm import get_svm
-from src.mlp import get_mlp
-from src.dataloader import get_train_dataloader, get_val_dataloader
-from src.plotting import plot_metrics_and_losses
-from src.callbacks import get_callbacks
+import pickle
+import numpy as np
+from tqdm import tqdm
 import os
-import tensorflow as tf
+
+from W3.src.mlp import get_mlp
+from W3.src.utils import prepare_gpu, compute_roc
+from W3.src.utils import load_images
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split")  # static
-    parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
-    parser.add_argument("-e", "--epochs", type=int, default=40)
-    parser.add_argument("-b", "--batch_size", type=int, default=8)
-    parser.add_argument("-out", "--output_dir", type=str, default="results/")
-    parser.add_argument("-m", "--model", type=str, default="mlp_five_layers")
+    parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split/")  # static
+    parser.add_argument("-m", "--model_name", type=str, default='mlp_baseline')
+    parser.add_argument("-mp", "--best_model_path", type=str, default="results/mlp_baseline-16-8-0.001-sgd/weights.h5")
     parser.add_argument("-in", "--input_size", type=int, default=16)
-    parser.add_argument("-opt", "--optimizer", type=str, default='sgd')
-    parser.add_argument("-s", "--svm", type=str, default='no')
-    parser.add_argument("-sl", "--slayer", type=str, default='second')
-
+    parser.add_argument("-out", "--output_dir", type=str, default="results/")
+    parser.add_argument("-ly", "--layer", type=str, default='second')
     return parser.parse_args()
-
-
-def prepare_gpu():
-    gpus = tf.config.list_physical_devices("GPU")
-    if gpus:
-        # Restrict TensorFlow to only use the first GPU
-        try:
-            tf.config.set_visible_devices(gpus[0], "GPU")
-            logical_gpus = tf.config.list_logical_devices("GPU")
-            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
-        except RuntimeError as e:
-            # Visible devices must be set before GPUs have been initialized
-            print(e)
 
 
 def main():
     input_size = args.input_size
-    lr = args.learning_rate
-    epochs = args.epochs
-    batch_size = args.batch_size
+    model_name = args.model_name
+    best_model_path = args.best_model_path
     output_dir = args.output_dir
-    model_name = args.model
     data_dir = args.data_dir
-    optimizer_name = args.optimizer
-    svm_check = args.svm
-    svm_layer = args.slayer
+    layer_name = args.layer
 
-    experiment_path = f"{output_dir}{model_name}-{input_size}-{batch_size}-{lr}-{optimizer_name}"
-    best_model_path = experiment_path + "/weights.h5"
-    plots_folder = experiment_path + '/plots/'
-    os.makedirs(plots_folder, exist_ok=True)
-    if svm_check == 'no':
-        model = get_mlp(
-            model_name=model_name,
-            input_shape=(input_size, input_size, 3),
-            output_shape=8
-        )
+    train_images_filenames = pickle.load(open(data_dir + 'train_images_filenames.dat', 'rb'))
+    test_images_filenames = pickle.load(open(data_dir + 'test_images_filenames.dat', 'rb'))
+    train_labels = pickle.load(open(data_dir + 'train_labels.dat', 'rb'))
+    test_labels = pickle.load(open(data_dir + 'test_labels.dat', 'rb'))
 
-        train_dataloader = get_train_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
-        val_dataloader = get_val_dataloader(patch_size=input_size, batch_size=batch_size, directory=data_dir)
+    # Load images
+    train_images = load_images(train_images_filenames, desc='Loading TRAIN images...')
+    test_images = load_images(test_images_filenames, desc='Loading TEST images...')
 
-        metrics = 'accuracy'
-        loss = 'categorical_crossentropy'
+    model = get_mlp(
+        model_name=model_name,
+        input_shape=(input_size, input_size, 3),
+        output_shape=8
+    )
 
-        # TODO: add optimizer with a lr scheduler (first the lr_scheduler, then the optimizer)
-        model.compile(optimizer=optimizer_name, loss=loss, metrics=metrics)
-        plot_model(model, to_file=plots_folder + 'modelMLP.png', show_shapes=True, show_layer_names=True)
+    print(model.summary())
+    plot_model(model, to_file=output_dir + 'svm_model.png', show_shapes=True, show_layer_names=True)
 
-        callbacks = get_callbacks(best_model_path, experiment_path, es_patience=15)
+    model.load_weights(best_model_path)
 
-        # Train model
+    train_features = []
+    model_layer = Model(inputs=model.input, outputs=model.get_layer(layer_name).output)
 
-        model.fit(
-            x=train_dataloader,
-            steps_per_epoch=len(train_dataloader),
-            epochs=epochs,
-            callbacks=callbacks,
-            validation_data=val_dataloader,
-            validation_steps=0 if val_dataloader is None else len(val_dataloader),
-            verbose=1,
-        )
-        plot_metrics_and_losses(history=model.history, path=plots_folder)
+    for x in tqdm(train_images):
+        x = np.expand_dims(np.resize(x, (input_size, input_size, 3)), axis=0)
+        x_features = model_layer.predict(x / 255.0)
+        train_features.append(np.asarray(x_features).reshape(-1))
 
+    train_features = np.asarray(train_features)
+    test_features = []
 
-    if svm_check == "yes":
-        model = get_mlp(
-            model_name=model_name,
-            input_shape=(input_size, input_size, 3),
-            output_shape=8
-        )
-        get_svm(model, svm_layer, input_size)
+    for x in tqdm(test_images):
+        x = np.expand_dims(np.resize(x, (input_size, input_size, 3)), axis=0)
+        x_features = model_layer.predict(x / 255.0)
+        test_features.append(np.asarray(x_features).reshape(-1))
 
-    print('\nFinished :)')
+    test_features = np.asarray(test_features)
 
+    scaler = StandardScaler()
+    scaler.fit(train_features)
+    train_features = scaler.transform(train_features)
+    test_features = scaler.transform(test_features)
+
+    parameters = {'kernel': ('rbf', 'linear', 'sigmoid')}
+    grid = GridSearchCV(svm.SVC(), parameters, n_jobs=3, cv=8, verbose=1)
+    grid.fit(train_features, train_labels)
+
+    best_kernel = grid.best_params_['kernel']
+
+    classifier = svm.SVC(kernel=best_kernel)
+    classifier.fit(train_features, train_labels)
+
+    accuracy = classifier.score(test_features, test_labels)
+
+    compute_roc(train_features, test_features, train_labels, test_labels, classifier, output_dir + 'ROC_svm.png')
+
+    print('Test accuracy: ', accuracy)
+
+    svm_kernel_pd = pd.DataFrame.from_dict(grid.cv_results_)
+
+    df_svm = svm_kernel_pd[['param_kernel', 'mean_test_score', 'std_test_score', 'rank_test_score']]
+    df_svm.rename(
+        columns={'param_kernel': 'Kernel', 'mean_test_score': 'Mean Accuracy', 'std_test_score': 'Std Accuracy',
+                 'rank_test_score': 'Rank best accuracy'}, inplace=True)
+    df_svm.to_csv(os.path.join(args.output_dir, 'svm_gridsearch.csv'))
 
 
 if __name__ == "__main__":
     prepare_gpu()
     args = parse_args()
     main()
-
-    # for i_size in [16, 32, 64]:
-    #     args.input_size = i_size
-    #     for lr in [0.001, 0.005]:
-    #         args.learning_rate = lr
-    #         for opt in ['sgd', 'adam']:
-    #             args.optimizer = opt
-    #             for batch_size in [8, 16, 32]:
-    #                 args.batch_size = batch_size
-    #                 main()

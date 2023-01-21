@@ -26,3 +26,4 @@ def plot_metrics_and_losses(history, path):
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
     plt.savefig(path + 'loss.jpg')
+    plt.close()
