@@ -1,10 +1,12 @@
 from typing import List
 from typing import Union
+import os
 
 import tensorflow as tf
+from keras.callbacks import CSVLogger
 
 
-def get_callbacks(model_path: str, es_use: bool = True, es_patience: int = 15) -> List[tf.keras.callbacks.Callback]:
+def get_callbacks(model_path: str, experiment_path: str, es_use: bool = True, es_patience: int = 15) -> List[tf.keras.callbacks.Callback]:
     """This function sets and returns a list of callbacks.
 
     :return: List of callbacks
@@ -12,6 +14,7 @@ def get_callbacks(model_path: str, es_use: bool = True, es_patience: int = 15) -
     callbacks = [
         get_model_checkpoint_callback(model_path),
         get_early_stopping(es_use, es_patience),
+        CSVLogger(experiment_path + 'log.csv', append=True, separator=';')
     ]
     return callbacks
 

@@ -31,13 +31,11 @@ def get_val_dataloader(directory: str, patch_size: int, batch_size: int) -> Dire
     :param batch_size: batch size
     :return: ImageDataGenerator
     """
-    train_datagen = ImageDataGenerator(
-        rescale=1. / 255,
-        horizontal_flip=True)
-    train_generator = train_datagen.flow_from_directory(
+    test_datagen = ImageDataGenerator(rescale=1. / 255)
+    validation_generator = test_datagen.flow_from_directory(
         directory + '/test',  # this is the target directory
         target_size=(patch_size, patch_size),  # all images will be resized to PATCH_SIZExPATCH_SIZE
         batch_size=batch_size,
         classes=['coast', 'forest', 'highway', 'inside_city', 'mountain', 'Opencountry', 'street', 'tallbuilding'],
         class_mode='categorical')  # since we use binary_crossentropy loss, we need categorical labels
-    return train_generator
+    return validation_generator

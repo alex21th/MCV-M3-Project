@@ -78,10 +78,14 @@ def main():
         validation_data=val_dataloader,
         validation_steps=0 if val_dataloader is None else len(val_dataloader),
         verbose=1,
+        workers=1
     )
 
     print('\nFinished :)')
     plot_metrics_and_losses(history=model.history, path=plots_folder)
+    model.load_weights(best_model_path)
+    res = model.evaluate(val_dataloader, verbose=1)
+    return res
 
 
 if __name__ == "__main__":
