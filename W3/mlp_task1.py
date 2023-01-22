@@ -14,7 +14,7 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split")  # static
     parser.add_argument("-lr", "--learning_rate", type=float, default=0.001)
-    parser.add_argument("-e", "--epochs", type=int, default=1)
+    parser.add_argument("-e", "--epochs", type=int, default=30)
     parser.add_argument("-b", "--batch_size", type=int, default=8)
     parser.add_argument("-out", "--output_dir", type=str, default="results/")
     parser.add_argument("-m", "--model", type=str, default="mlp_baseline")
@@ -94,15 +94,15 @@ if __name__ == "__main__":
     
     results = []
 
-    for model in ['mlp_five_layers']:
+    for model in ['mlp_baseline', 'mlp_five_layers']:
         args.model = model
-        for i_size in [64]:
+        for i_size in [16, 32, 64]:
             args.input_size = i_size
             for lr in [0.001, 0.005]:
                 args.learning_rate = lr
                 for opt in ['sgd', 'adam']:
                     args.optimizer = opt
-                    for batch_size in [8, 16, 24]:
+                    for batch_size in [8, 16]:
                         print(f"Model: {model}, input_size: {i_size}, lr: {lr}, opt: {opt}, batch_size: {batch_size}")
                         args.batch_size = batch_size
                         try:
