@@ -116,5 +116,5 @@ if __name__ == "__main__":
                         results.append(result)
 
     df = pd.DataFrame(results, columns=['Model', 'Input size', 'Learning rate',
-                                        'Optimizer', 'Batch size', 'Best val. accuracy'])
+                                        'Optimizer', 'Batch size', 'Best val. loss', 'Best val. accuracy'])
     df.to_csv(os.path.join(args.output_dir, 'mlp_task1_results.csv'))
