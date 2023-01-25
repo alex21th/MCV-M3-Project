@@ -8,7 +8,7 @@ output_path: 'results_ft/'
 
 # Training Setting
 optimizer:
-  type: sgd
+  type: adam
   params:
     momentum: 0.9
     weight_decay: 0.0001
@@ -24,12 +24,12 @@ wandb:
 
 
 lr_scheduler:
-  type: constant
+  type: step
   params:
     base_lr: 0.001
-    num_epochs: 20
-    decay_rate: 0.96
-    drop_every: 3
+    num_epochs: 50
+    decay_rate: 0.1
+    drop_every: 5
 
 
 early_stopping:

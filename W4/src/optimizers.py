@@ -36,7 +36,7 @@ class StepDecay(LearningRateSchedule):
         self.drop_every = drop_every
 
     def __call__(self, step: int):
-        step_float = math_ops.cast(step, tf.float32)
+        step_int = math_ops.cast(step, tf.int32)
 
         init_lr = ops.convert_to_tensor_v2_with_dispatch(
             self.init_lr, name="init_lr"
@@ -54,10 +54,14 @@ class StepDecay(LearningRateSchedule):
             self.drop_every, name="drop_every"
         )
         # compute the total number of epochs that have passed
-        epoch = math_ops.floordiv(step_float, steps_per_epoch)
+        epoch = math_ops.floordiv(step_int, steps_per_epoch)
+
+        epoch_float = math_ops.cast(epoch, tf.float32)
+        drop_every_float = math_ops.cast(drop_every, tf.float32)
         # compute the learning rate for the current epoch
-        exp = math_ops.floor((math_ops.div((1 + epoch), drop_every)))
-        lr = math_ops.mul(init_lr, math_ops.exp(factor, exp))
+        exp = math_ops.floor((math_ops.divide((1 + epoch_float), drop_every_float)))
+        fact_exp = math_ops.pow(factor, exp)
+        lr = math_ops.mul(init_lr, fact_exp)
         # return the learning rate
         return lr
 
@@ -84,7 +88,7 @@ def get_lr(
         lr = config['base_lr']
     elif lr_decay_scheduler_name == 'step':
         lr = StepDecay(
-            steps_per_epoch=(num_iterations//config['batch_size']),
+            steps_per_epoch=num_iterations,
             init_alpha=config['base_lr'],
             factor=config['decay_rate'],
             drop_every=config['drop_every'],

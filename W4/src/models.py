@@ -6,7 +6,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.layers import Dropout
 
 
-def get_model(model_name: str, out_dir: str, input_size: int = 224):
+def get_model(model_name: str, out_dir: str = None, input_size: int = 224):
     """
     Get a mobilenet model
     :param model_name: model name
@@ -15,18 +15,18 @@ def get_model(model_name: str, out_dir: str, input_size: int = 224):
     :return: model
     """
     if model_name == 'ft_baseline':
-        model = ft_baseline(out_dir, input_size)
+        model = ft_baseline
     elif model_name == 'ft_dense_head':
-        model = ft_dense_head(out_dir, input_size)
+        model = ft_dense_head
     elif model_name == 'ft_dropout':
-        model = ft_dense_head_dropout(out_dir, input_size)
+        model = ft_dense_head_dropout
     else:
         raise ValueError(f'Unknown model name: {model_name}')
-    return model
+    return model(out_dir, input_size)
 
 
 # TASK 0: Create a baseline model for fine-tuning
-def ft_baseline(out_dir: str, input_size: int = 224):
+def ft_baseline(out_dir: str = None, input_size: int = 224):
     """
     Create a baseline model for fine-tuning
     :param out_dir: output directory
@@ -35,19 +35,21 @@ def ft_baseline(out_dir: str, input_size: int = 224):
     """
     base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(input_size, input_size, 3))
     base_model.trainable = False
-    base_model.summary()
-    plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
+    if out_dir is not None:
+        base_model.summary()
+        plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
 
     head_model = Flatten(name="flatten")(base_model.output)
     head_model = Dense(8, activation='softmax', name='predictions')(head_model)
 
     model = Model(inputs=base_model.input, outputs=head_model)
-    plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
+    if out_dir is not None:
+        plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
     return model
 
 
 # TASK 1: Improved dense head
-def ft_dense_head(out_dir: str, input_size: int = 224):
+def ft_dense_head(out_dir: str = None, input_size: int = 224):
     """
     Create a baseline model for fine-tuning
     :param out_dir: output directory
@@ -56,8 +58,9 @@ def ft_dense_head(out_dir: str, input_size: int = 224):
     """
     base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(input_size, input_size, 3))
     base_model.trainable = False
-    base_model.summary()
-    plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
+    if out_dir is not None:
+        base_model.summary()
+        plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
 
     head_model = Flatten(name="flatten")(base_model.output)
     head_model = Dense(2048, activation='relu')(head_model)
@@ -65,12 +68,13 @@ def ft_dense_head(out_dir: str, input_size: int = 224):
     head_model = Dense(8, activation='softmax', name='predictions')(head_model)
 
     model = Model(inputs=base_model.input, outputs=head_model)
-    plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
+    if out_dir is not None:
+        plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
     return model
 
 
 # TASK 1: Improved dense head with dropout
-def ft_dense_head_dropout(out_dir: str, input_size: int = 224):
+def ft_dense_head_dropout(out_dir: str = None, input_size: int = 224):
     """
     Create a baseline model for fine-tuning
     :param out_dir: output directory
@@ -79,8 +83,9 @@ def ft_dense_head_dropout(out_dir: str, input_size: int = 224):
     """
     base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(input_size, input_size, 3))
     base_model.trainable = False
-    base_model.summary()
-    plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
+    if out_dir is not None:
+        base_model.summary()
+        plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
 
     head_model = Flatten(name="flatten")(base_model.output)
     head_model = Dense(2048, activation='relu')(head_model)
@@ -90,10 +95,11 @@ def ft_dense_head_dropout(out_dir: str, input_size: int = 224):
     head_model = Dense(8, activation='softmax', name='predictions')(head_model)
 
     model = Model(inputs=base_model.input, outputs=head_model)
-    plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
+    if out_dir is not None:
+        plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
     return model
 
 
 # TODO: Implement a model that include architectural changes, not only modifying the head
-def modified_mobilenet(out_dir: str, input_size: int = 224):
+def modified_mobilenet(out_dir: str = None, input_size: int = 224):
     pass
