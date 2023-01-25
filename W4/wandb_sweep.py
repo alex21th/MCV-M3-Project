@@ -12,12 +12,25 @@ from W4.src.utils import prepare_gpu, load_config_from_yaml
 import tensorflow as tf
 
 
+def nested_dict(original_dict):
+    nested_dict = {}
+    for key, value in original_dict.items():
+        parts = key.split(".")
+        d = nested_dict
+        for part in parts[:-1]:
+            if part not in d:
+                d[part] = {}
+            d = d[part]
+        d[parts[-1]] = value
+    return nested_dict
+
+
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
         "-c", "--config", type=str, default="config_files/fine_tuning.yaml")
     parser.add_argument(
-        "-sc", "--sweep_config", type=str, default="config_files/sweep_config.yaml")
+        "-sc", "--sweep_config", type=str, default="config_files/wandb_sweep.yaml")
     return parser.parse_args()
 
 
@@ -25,6 +38,10 @@ def train_loop(config: Dict = None):
     # Initialize a new wandb run
     with wandb.init(config=config):
         # unpack config dictionaries
+        config = wandb.config
+
+        config = nested_dict(config)
+
         model_name = config['model_name']
         lr_schedule_config = config["lr_scheduler"]
         optimizer_config = config["optimizer"]
@@ -74,8 +91,8 @@ def train_loop(config: Dict = None):
 if __name__ == '__main__':
     prepare_gpu()
     args = parse_args()
-    g_config = load_config_from_yaml(args.config)
-    DATA_DIR = g_config['data_dir']
+    g_config = load_config_from_yaml(args.config)['dataloaders']
+    DATA_DIR = g_config['data_path']
     INPUT_SIZE = g_config['input_size']
     sweep_config = load_config_from_yaml(args.sweep_config)
     sweep_id = wandb.sweep(sweep_config, project="task_0_sweep")

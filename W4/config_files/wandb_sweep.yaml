@@ -1,0 +1,49 @@
+method: bayes
+metric:
+  name: epoch/val_loss
+  goal: minimize
+parameters:
+  model_name:
+    value: ft_baseline
+  epochs:
+    value: 50
+  optimizer.type:
+    distribution: categorical
+    values:
+      - sgd
+      - adam
+  optimizer.params.momentum:
+    value: 0.9
+  optimizer.params.weight_decay:
+    distribution: uniform
+    min: 0.00005
+    max: 0.002
+  batch_size:
+    distribution: categorical
+    values:
+      - 8
+      - 16
+      - 32
+  lr_scheduler.type:
+    distribution: categorical
+    values:
+      - step
+      - constant
+  lr_scheduler.params.base_lr:
+    distribution: uniform
+    min: 0.0005
+    max: 0.002
+  lr_scheduler.params.decay_rate:
+    distribution: uniform
+    min: 0.05
+    max: 0.2
+  lr_scheduler.params.drop_every:
+    distribution: int_uniform
+    min: 3
+    max: 10
+  early_stopping.use:
+    value: "true"
+  early_stopping.patience:
+    distribution: int_uniform
+    min: 5
+    max: 10

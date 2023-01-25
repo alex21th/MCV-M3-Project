@@ -27,7 +27,6 @@ lr_scheduler:
   type: step
   params:
     base_lr: 0.001
-    num_epochs: 50
     decay_rate: 0.1
     drop_every: 5
 
