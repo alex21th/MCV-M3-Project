@@ -40,13 +40,14 @@ def main(params):
     data_dir = data_config["data_path"]
     inference_batch_size = data_config["inference_batch_size"]
 
-    wandb.init(project=wandb_config['project'], entity=wandb_config['entity'])
     wandb.config = {
         "learning_rate": base_lr,
         "lr_scheduler": lr_schedule_config["type"],
         "epochs": epochs,
         "batch_size": batch_size
     }
+
+    wandb.init(project=wandb_config['project'], entity=wandb_config['entity'], config=wandb.config)
 
     os.makedirs(out_dir, exist_ok=True)
 
