@@ -2,7 +2,7 @@ import os
 from argparse import ArgumentParser
 
 from keras.layers import Dropout
-from tensorflow.keras.layers import AveragePooling2D, Flatten
+from tensorflow.keras.layers import Flatten
 
 import wandb
 from wandb.keras import WandbMetricsLogger
@@ -12,33 +12,39 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.utils import plot_model
 
 from W4.src.dataloader import get_train_dataloader, get_val_dataloader
-from W4.src.utils import prepare_gpu, plot_metrics_and_losses
+from W4.src.optimizers import get_lr, get_optimizer
+from W4.src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yaml
+
+import tensorflow as tf
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("-d", "--data_dir", type=str, default="../MIT_split/")  # static
-    parser.add_argument("-mp", "--best_model_path", type=str, default="best_ft_model.h5")
-    parser.add_argument("-in", "--input_size", type=int, default=224)
-    parser.add_argument("-bs", "--batch_size", type=int, default=32)
-    parser.add_argument("-ft_e", "--ft_epochs", type=int, default=20)
-    parser.add_argument("-ft_lr", "--ft_lr", type=int, default=0.001)
-    parser.add_argument("-out", "--output_dir", type=str, default="results_ft/")
+    parser.add_argument(
+        "-c", "--config", type=str, default="config_files/fine_tuning.yaml"
+    )
     return parser.parse_args()
 
 
 def main(params):
-    ft_lr = params.ft_lr
-    ft_epochs = params.ft_epochs
-    batch_size = params.batch_size
-    out_dir = params.output_dir
-    data_dir = params.data_dir
-    input_size = params.input_size
+    config = load_config_from_yaml(params.config)
+    lr_schedule_config = config["lr_scheduler"]
+    out_dir = config["output_path"]
+    optimizer_config = config["optimizer"]
+    wandb_config = config["wandb"]
+    data_config = config["dataloaders"]
+    input_size = data_config["input_size"]
+    batch_size = data_config["batch_size"]
+    epochs = lr_schedule_config["params"]["num_epochs"]
+    base_lr = lr_schedule_config["params"]["base_lr"]
+    data_dir = data_config["data_path"]
+    inference_batch_size = data_config["inference_batch_size"]
 
-    wandb.init(project="test-project", entity="mcv-m3-g6")
+    wandb.init(project=wandb_config['project'], entity=wandb_config['entity'])
     wandb.config = {
-        "learning_rate": ft_lr,
-        "epochs": ft_epochs,
+        "learning_rate": base_lr,
+        "lr_scheduler": lr_schedule_config["type"],
+        "epochs": epochs,
         "batch_size": batch_size
     }
 
@@ -50,29 +56,47 @@ def main(params):
     plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
 
     head_model = Flatten(name="flatten")(base_model.output)
-    head_model = Dropout(0.2)(head_model)
-    head_model = Dense(2048, activation='relu', name='dense_head_1')(head_model)
-    head_model = Dropout(0.2)(head_model)
-    head_model = Dense(1024, activation='relu', name='dense_head_2')(head_model)
-    head_model = Dropout(0.2)(head_model)
     head_model = Dense(8, activation='softmax', name='predictions')(head_model)
 
     model = Model(inputs=base_model.input, outputs=head_model)
     plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
 
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
     train_dataloader = get_train_dataloader(directory=data_dir, patch_size=input_size,
                                             batch_size=batch_size)
     validation_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size,
-                                               batch_size=params.batch_size)
-    test_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size, batch_size=1)
+                                               batch_size=batch_size)
+    test_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size, batch_size=inference_batch_size)
+
+    lr = get_lr(
+        lr_decay_scheduler_name=lr_schedule_config["type"],
+        num_iterations=len(train_dataloader),
+        config=lr_schedule_config["params"]
+    )
+
+    optimizer = get_optimizer(
+        optimizer_name=optimizer_config["type"],
+        learning_rate=lr,
+        params=optimizer_config["params"]
+    )
+
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+
+    callbacks = [WandbMetricsLogger()]
+
+    if config['early_stopping']['use']:
+        callbacks.append(tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss',
+            patience=config['early_stopping']['patience']
+        ))
 
     history = model.fit(train_dataloader,
                         steps_per_epoch=len(train_dataloader),
-                        epochs=ft_epochs,
+                        epochs=epochs,
                         validation_data=validation_dataloader,
-                        validation_steps=len(validation_dataloader), callbacks=[WandbMetricsLogger()])
+                        validation_steps=len(validation_dataloader),
+                        callbacks=callbacks,
+                        verbose=1
+                        )
 
     result = model.evaluate(test_dataloader)
     print(result)

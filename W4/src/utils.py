@@ -1,4 +1,7 @@
+from typing import Dict
+
 import tensorflow as tf
+import yaml
 
 from matplotlib import pyplot as plt
 
@@ -42,3 +45,18 @@ def plot_metrics_and_losses(history, path: str):
     plt.legend(['train', 'validation'], loc='upper left')
     plt.savefig(path + 'loss.jpg')
     plt.close()
+
+
+def load_config_from_yaml(path_to_file: str) -> Dict:
+    """This function loads a .yaml file from a certain path and returns the
+    config.
+
+    :param path_to_file: path to yaml file
+    :return: dictionary containing the configuration
+    """
+    config = None
+    if path_to_file.endswith(".yaml"):
+        with open(path_to_file) as f:
+            config = yaml.load(f, Loader=yaml.FullLoader)
+
+    return config
