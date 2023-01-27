@@ -39,6 +39,7 @@ def main(params):
     epochs = config['epochs']
     data_dir = data_config["data_path"]
     inference_batch_size = data_config["inference_batch_size"]
+    data_augmentation = data_config["data_augmentation"]
     out_dir = config["output_path"]
     os.makedirs(out_dir, exist_ok=True)
 
@@ -56,7 +57,7 @@ def main(params):
     model = get_model(model_name=model_config['name'], out_dir=out_dir)
 
     train_dataloader = get_train_dataloader(directory=data_dir, patch_size=input_size,
-                                            batch_size=batch_size)
+                                            batch_size=batch_size, data_augmentation=data_augmentation)
     validation_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size,
                                                batch_size=batch_size)
     test_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size, batch_size=inference_batch_size)

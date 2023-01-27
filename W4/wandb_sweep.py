@@ -54,7 +54,7 @@ def train_loop(config: Dict = None):
         model = get_model(model_name=model_name)
 
         train_dataloader = get_train_dataloader(directory=DATA_DIR, patch_size=INPUT_SIZE,
-                                                batch_size=batch_size)
+                                                batch_size=batch_size, data_augmentation=data_augmentation)
         validation_dataloader = get_val_dataloader(directory=DATA_DIR, patch_size=INPUT_SIZE,
                                                    batch_size=batch_size)
 
