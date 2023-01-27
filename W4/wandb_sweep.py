@@ -46,6 +46,8 @@ def train_loop(config: Dict = None):
         lr_schedule_config = config["lr_scheduler"]
         optimizer_config = config["optimizer"]
         batch_size = config["batch_size"]
+        data_config = config["dataloaders"]
+        data_augmentation = data_config["data_augmentation"]
         epochs = config['epochs']
         early_stop_config = config["early_stopping"]
 

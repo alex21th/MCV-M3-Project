@@ -1,36 +1,47 @@
 dataloaders:
-  data_path: '../MIT_split/'
+  data_path: '../data/MIT_split/'
   input_size: 224
   batch_size: 32
   inference_batch_size: 1
+  data_augmentation:
+    use: False
+    rotation_range: 20
+    width_shift_range: 0.2
+    height_shift_range: 0.2
+    shear_range: 0.2
+    zoom_range: 0.2
+    channel_shift_range: 0.2
 
 output_path: 'results_ft/'
-
+epochs: 50
 # Training Setting
 optimizer:
-  type: adam
+  type: sgd
   params:
     momentum: 0.9
     weight_decay: 0.0001
 
 model:
   name: 'ft_baseline'
+  pops:
 
 
 # Callbacks Settings
 wandb:
-  project: 'task_0'
+  project: 'task_0_final'
   entity: 'mcv-m3-g6'
 
 
 lr_scheduler:
-  type: step
+  type: constant
   params:
-    base_lr: 0.001
-    decay_rate: 0.1
+    base_lr: 0.005
+    decay_rate: 0.2
     drop_every: 5
 
 
 early_stopping:
   use: True
-  patience: 6
+  patience: 15
+
+

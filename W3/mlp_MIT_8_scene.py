@@ -17,7 +17,7 @@ import numpy as np
 # user defined variables
 IMG_SIZE = 64
 BATCH_SIZE = 32
-DATASET_DIR = '../MIT_split'
+DATASET_DIR = '../data/MIT_split'
 MODEL_FNAME = 'models/try2.h5'
 
 if not os.path.exists(DATASET_DIR):

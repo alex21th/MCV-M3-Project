@@ -8,8 +8,8 @@ from src.utils import *
 # user defined variables
 PATCH_SIZE = 64
 BATCH_SIZE = 16
-DATASET_DIR = '../MIT_split'
-PATCHES_DIR = '../MIT_split_patches'
+DATASET_DIR = '../data/MIT_split'
+PATCHES_DIR = '../data/MIT_split_patches'
 RESULTS = 'results/patches/'
 MODEL_FNAME = RESULTS + 'model_mlp_patches.h5'
 WEIGHTS_FNAME = RESULTS + 'weights_mlp_patches.h5'

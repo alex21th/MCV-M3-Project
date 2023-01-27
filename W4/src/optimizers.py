@@ -71,7 +71,6 @@ class StepDecay(LearningRateSchedule):
             "factor": self.factor,
             "drop_every": self.drop_every,
             "steps_per_epoch": self.steps_per_epoch,
-            "name": self._name,
         }
 
 

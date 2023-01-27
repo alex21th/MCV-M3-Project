@@ -1,4 +1,4 @@
-from keras.layers import Flatten
+from keras.layers import Flatten, AveragePooling2D
 from tensorflow.keras.applications.mobilenet import MobileNet
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Model
@@ -101,5 +101,33 @@ def ft_dense_head_dropout(out_dir: str = None, input_size: int = 224):
 
 
 # TODO: Implement a model that include architectural changes, not only modifying the head
-def modified_mobilenet(out_dir: str = None, input_size: int = 224):
-    pass
+def modified_mobilenet(out_dir: str = None, input_size: int = 224, pops: int = 3):
+    """
+    Create a baseline model for fine-tuning
+    :param out_dir: output directory
+    :param input_size: input size
+    :param pops: number of layers to pop
+    :return: model
+    """
+    base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(input_size, input_size, 3))
+    base_model.trainable = False
+
+    for i in range(pops):
+        base_model.layers.pop()
+
+    if out_dir is not None:
+        base_model.summary()
+        plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
+
+
+    head_model = Avera(name="flatten")(base_model.output)
+    head_model = Dense(2048, activation='relu')(head_model)
+    head_model = Dropout(0.5)(head_model)
+    head_model = Dense(1024, activation='relu')(head_model)
+    head_model = Dropout(0.2)(head_model)
+    head_model = Dense(8, activation='softmax', name='predictions')(head_model)
+
+    model = Model(inputs=base_model.input, outputs=head_model)
+    if out_dir is not None:
+        plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
+    return model

@@ -1,8 +1,9 @@
 import os
 from argparse import ArgumentParser
 
+from wandb.integration.keras import WandbCallback
+
 import wandb
-from wandb.keras import WandbMetricsLogger
 
 
 from W4.src.dataloader import get_train_dataloader, get_val_dataloader
@@ -35,7 +36,7 @@ def main(params):
     # unpack useful values from config dictionaries
     input_size = data_config["input_size"]
     batch_size = data_config["batch_size"]
-    epochs = lr_schedule_config["params"]["num_epochs"]
+    epochs = config['epochs']
     data_dir = data_config["data_path"]
     inference_batch_size = data_config["inference_batch_size"]
     out_dir = config["output_path"]
@@ -74,7 +75,7 @@ def main(params):
 
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
-    callbacks = [WandbMetricsLogger()]
+    callbacks = [WandbCallback(), ]
 
     if config['early_stopping']['use']:
         callbacks.append(tf.keras.callbacks.EarlyStopping(

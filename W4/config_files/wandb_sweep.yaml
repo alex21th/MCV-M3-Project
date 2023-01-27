@@ -44,6 +44,4 @@ parameters:
   early_stopping.use:
     value: "true"
   early_stopping.patience:
-    distribution: int_uniform
-    min: 5
-    max: 10
+    value: 5

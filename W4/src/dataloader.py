@@ -33,7 +33,9 @@ def get_val_dataloader(directory: str, patch_size: int, batch_size: int) -> Dire
     :param batch_size: batch size
     :return: ImageDataGenerator
     """
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
+    test_datagen = ImageDataGenerator(
+        preprocessing_function=preprocess_input
+    )
     validation_generator = test_datagen.flow_from_directory(
         directory + '/test',  # this is the target directory
         target_size=(patch_size, patch_size),  # all images will be resized to PATCH_SIZExPATCH_SIZE

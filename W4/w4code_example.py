@@ -9,9 +9,9 @@ from tensorflow.keras.utils import plot_model
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-train_data_dir = '../MIT_split/train'
-val_data_dir = '../MIT_split/test'
-test_data_dir = '../MIT_split/test'
+train_data_dir = '../data/MIT_split/train'
+val_data_dir = '../data/MIT_split/test'
+test_data_dir = '../data/MIT_split/test'
 img_width = 224
 img_height = 224
 batch_size = 16
@@ -94,7 +94,7 @@ history = model.fit(train_generator,
                     steps_per_epoch=(int(400 // batch_size) + 1),
                     epochs=number_of_epoch,
                     validation_data=validation_generator,
-                    validation_steps=(int(validation_samples // batch_size) + 1), callbacks=[])
+                    validation_steps=len(validation_generator), callbacks=[])
 
 result = model.evaluate(test_generator)
 print(result)
