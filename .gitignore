@@ -1,10 +1,19 @@
-.DS_Store
+
 .gitignore
-W2/scripts/__pycache__/gridsearch_svm.cpython-310.pyc
-W2/scripts/__pycache__/utils.cpython-310.pyc
-W3/src/__pycache__/dataloader.cpython-310.pyc
-W3/src/__pycache__/mlp.cpython-310.pyc
-W3/src/__pycache__/utils.cpython-310.pyc
-W3/src/__pycache__/mlp.cpython-39.pyc
-W3/src/__pycache__/mlp.cpython-39.pyc
-W3/src/__pycache__/mlp.cpython-39.pyc
+
+# VSCode
+.vscode/
+.idea/
+*.code-workspace
+
+# Virtual environment
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MacOS
+.DS_Store
+
+# Python cache
+**/__pycache__/

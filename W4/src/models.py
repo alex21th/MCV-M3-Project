@@ -13,6 +13,7 @@ def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops:
     :param model_name: model name
     :param out_dir: output directory
     :param input_size: input size
+    :param pops: number of block layers to remove from head
     :return: model
     """
     if model_name == 'ft_baseline':
