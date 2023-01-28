@@ -42,7 +42,6 @@ def train_loop(config: Dict = None):
 
         config = nested_dict(config)
 
-        model_name = config['model_name']
         lr_schedule_config = config["lr_scheduler"]
         optimizer_config = config["optimizer"]
         batch_size = config["batch_size"]
@@ -51,7 +50,7 @@ def train_loop(config: Dict = None):
         epochs = config['epochs']
         early_stop_config = config["early_stopping"]
 
-        model = get_model(model_name=model_name)
+        model = get_model(model_name=config['model'], pops=config['pops'])
 
         train_dataloader = get_train_dataloader(directory=DATA_DIR, patch_size=INPUT_SIZE,
                                                 batch_size=batch_size, data_augmentation=data_augmentation)
@@ -97,5 +96,5 @@ if __name__ == '__main__':
     DATA_DIR = g_config['data_path']
     INPUT_SIZE = g_config['input_size']
     sweep_config = load_config_from_yaml(args.sweep_config)
-    sweep_id = wandb.sweep(sweep_config, project="task_0_sweep")
-    wandb.agent(sweep_id, train_loop, count=30)
+    sweep_id = wandb.sweep(sweep_config, project="task_3_4_5_sweep")
+    wandb.agent(sweep_id, train_loop, count=50)

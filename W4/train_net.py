@@ -1,7 +1,7 @@
 import os
 from argparse import ArgumentParser
 
-from wandb.integration.keras import WandbCallback
+from wandb.integration.keras import WandbMetricsLogger
 
 import wandb
 
@@ -54,7 +54,7 @@ def main(params):
 
     wandb.init(project=wandb_config['project'], entity=wandb_config['entity'], config=run_config)
 
-    model = get_model(model_name=model_config['name'], out_dir=out_dir)
+    model = get_model(model_name=model_config['name'], out_dir=out_dir, pops=model_config['pops'])
 
     train_dataloader = get_train_dataloader(directory=data_dir, patch_size=input_size,
                                             batch_size=batch_size, data_augmentation=data_augmentation)
@@ -76,7 +76,7 @@ def main(params):
 
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
-    callbacks = [WandbCallback(), ]
+    callbacks = [WandbMetricsLogger()]
 
     if config['early_stopping']['use']:
         callbacks.append(tf.keras.callbacks.EarlyStopping(

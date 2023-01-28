@@ -1,5 +1,5 @@
 dataloaders:
-  data_path: '../data/MIT_split/'
+  data_path: '../data/MIT_small_train_1/'
   input_size: 224
   batch_size: 32
   inference_batch_size: 1
@@ -22,13 +22,13 @@ optimizer:
     weight_decay: 0.0001
 
 model:
-  name: 'ft_baseline'
-  pops:
+  name: 'modified_mobilenet'
+  pops: 0
 
 
 # Callbacks Settings
 wandb:
-  project: 'task_0_final'
+  project: 'task_1'
   entity: 'mcv-m3-g6'
 
 
