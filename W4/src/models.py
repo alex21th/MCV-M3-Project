@@ -133,5 +133,37 @@ def modified_mobilenet(out_dir: str = None, input_size: int = 224, pops: int = 6
 
     model = Model(inputs=base_model.input, outputs=head_model)
     if out_dir is not None:
+        model.summary()
+        plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
+    return model
+
+
+def modified_mobilenet_reduced(out_dir: str = None, input_size: int = 224, pops: int = 6):
+    """
+    Create a baseline model for fine-tuning
+    :param out_dir: output directory
+    :param input_size: input size
+    :param pops: number of layers to pop
+    :return: model
+    """
+    base_model = MobileNet(weights='imagenet', include_top=False, input_shape=(input_size, input_size, 3))
+    base_model.trainable = False
+
+    if pops > 0:
+        base_model = tf.keras.models.Sequential(base_model.layers[:-pops])
+
+    if out_dir is not None:
+        base_model.summary()
+        plot_model(base_model, to_file=out_dir + 'base_mobilenet.png', show_shapes=True, show_layer_names=True)
+
+    head_model = AveragePooling2D(pool_size=(7, 7), name='average_pool_last')(base_model.output)
+    head_model = Flatten(name="flatten")(head_model)
+    head_model = Dense(1024, activation='relu')(head_model)
+    head_model = Dropout(0.2)(head_model)
+    head_model = Dense(8, activation='softmax', name='predictions')(head_model)
+
+    model = Model(inputs=base_model.input, outputs=head_model)
+    if out_dir is not None:
+        model.summary()
         plot_model(model, to_file=out_dir + 'finetuning_mobilenet.png', show_shapes=True, show_layer_names=True)
     return model
