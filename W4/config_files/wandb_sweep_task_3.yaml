@@ -1,0 +1,83 @@
+method: bayes
+metric:
+  name: epoch/val_loss
+  goal: minimize
+parameters:
+  model:
+    value: modified_mobilenet
+  pops:
+    value: 6
+  epochs:
+    value: 100
+  optimizer.type:
+    distribution: categorical
+    values:
+      - sgd
+      - adam
+  optimizer.params.momentum:
+    value: 0.9
+  optimizer.params.weight_decay:
+    distribution: uniform
+    min: 0.00005
+    max: 0.0002
+  batch_size:
+    distribution: categorical
+    values:
+      - 16
+      - 32
+  lr_scheduler.type:
+    value: step
+  lr_scheduler.params.base_lr:
+    distribution: uniform
+    min: 0.00075
+    max: 0.01
+  lr_scheduler.params.decay_rate:
+    distribution: uniform
+    min: 0.1
+    max: 0.4
+  lr_scheduler.params.drop_every:
+    distribution: int_uniform
+    min: 3
+    max: 10
+  early_stopping.use:
+    value: True
+  early_stopping.patience:
+    value: 10
+  dataloaders.data_augmentation.use:
+    value: True
+  dataloaders.data_augmentation.rotation_range:
+    distribution: categorical
+    values:
+      - 0
+      - 10
+      - 25
+  dataloaders.data_augmentation.width_shift_range:
+    distribution: categorical
+    values:
+      - 0
+      - 0.1
+      - 0.2
+  dataloaders.data_augmentation.height_shift_range:
+    distribution: categorical
+    values:
+      - 0
+      - 0.1
+      - 0.2
+  dataloaders.data_augmentation.shear_range:
+    distribution: categorical
+    values:
+      - 0
+      - 0.1
+      - 0.2
+  dataloaders.data_augmentation.zoom_range:
+    distribution: categorical
+    values:
+      - 0
+      - 0.1
+      - 0.2
+  dataloaders.data_augmentation.channel_shift_range:
+    distribution: categorical
+    values:
+      - 0
+      - 0.1
+      - 0.2
