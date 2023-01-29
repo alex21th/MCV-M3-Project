@@ -23,7 +23,7 @@ optimizer:
 
 model:
   name: 'modified_mobilenet'
-  pops: 0
+  pops: 6
 
 
 # Callbacks Settings
