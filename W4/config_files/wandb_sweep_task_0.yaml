@@ -4,12 +4,9 @@ metric:
   goal: minimize
 parameters:
   model:
-    value: modified_mobilenet
+    value: ft_baseline
   pops:
-    distribution: categorical
-    values:
-      - 6
-      - 0
+    value: 0
   epochs:
     value: 100
   optimizer.type:
@@ -32,8 +29,8 @@ parameters:
   lr_scheduler.type:
     distribution: categorical
     values:
-      - constant
-      - step
+    - step
+    - constant
   lr_scheduler.params.base_lr:
     distribution: uniform
     min: 0.00075
