@@ -30,7 +30,7 @@ def parse_args():
     parser.add_argument(
         "-c", "--config", type=str, default="config_files/fine_tuning.yaml")
     parser.add_argument(
-        "-sc", "--sweep_config", type=str, default="config_files/wandb_sweep.yaml")
+        "-sc", "--sweep_config", type=str, default="config_files/wandb_sweep_task_4.yaml")
     return parser.parse_args()
 
 
@@ -96,5 +96,5 @@ if __name__ == '__main__':
     DATA_DIR = g_config['data_path']
     INPUT_SIZE = g_config['input_size']
     sweep_config = load_config_from_yaml(args.sweep_config)
-    sweep_id = wandb.sweep(sweep_config, project="task_3_4_5_sweep")
+    sweep_id = wandb.sweep(sweep_config, project="task_4_sweep")
     wandb.agent(sweep_id, train_loop, count=50)

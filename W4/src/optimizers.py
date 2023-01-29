@@ -96,7 +96,7 @@ def get_lr(
         lr = tf.keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate=config['base_lr'],
             decay_steps=num_iterations,
-            decay_rate=config['decay_rate'],
+            decay_rate=config['exp_decay_rate'],
             staircase=True,
         )
     elif lr_decay_scheduler_name == 'cosine':
