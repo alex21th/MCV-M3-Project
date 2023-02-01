@@ -43,7 +43,6 @@ parameters:
   lr_scheduler.params.alpha:
     distribution: categorical
     values:
-      - 0.1
       - 0.0
       - 0.01
       - 0.05
@@ -66,7 +65,7 @@ parameters:
   dataloaders.data_augmentation.shear_range:
     value: 0.2
   dataloaders.data_augmentation.zoom_range:
-    values: 0.1
+    value: 0.1
   dataloaders.data_augmentation.channel_shift_range:
     value: 0.1
 
