@@ -1,0 +1,45 @@
+dataloaders:
+  data_path: '../data/MIT_small_train_4/'
+  input_size: 256
+  batch_size: 8
+  inference_batch_size: 1
+  data_augmentation:
+    use: True
+    rotation_range: 20
+    width_shift_range: 0.2
+    height_shift_range: 0.2
+    shear_range: 0.2
+    zoom_range: 0.2
+    channel_shift_range: 0.2
+
+output_path: 'results_ft/'
+epochs: 50
+# Training Setting
+optimizer:
+  type: sgd
+  params:
+    momentum: 0.9
+    weight_decay: 0.0001
+
+model:
+  name: 'mobilenet_v3'
+  pops: 6
+
+
+# Callbacks Settings
+wandb:
+  project: 'w5-test'
+  entity: 'mcv-m3-g6'
+
+
+lr_scheduler:
+  type: constant
+  params:
+    base_lr: 0.001
+    decay_rate: 0.2
+    drop_every: 5
+
+
+early_stopping:
+  use: True
+  patience: 15

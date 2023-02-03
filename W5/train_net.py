@@ -6,10 +6,10 @@ from wandb.integration.keras import WandbMetricsLogger
 import wandb
 
 
-from W4.src.dataloader import get_train_dataloader, get_val_dataloader
-from W4.src.models import get_model
-from W4.src.optimizers import get_lr, get_optimizer
-from W4.src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yaml
+from W5.src.dataloader import get_train_dataloader, get_val_dataloader
+from W5.src.models import get_model
+from W5.src.optimizers import get_lr, get_optimizer
+from W5.src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yaml
 
 import tensorflow as tf
 
@@ -17,7 +17,7 @@ import tensorflow as tf
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        "-c", "--config", type=str, default="config_files/fine_tuning.yaml"
+        "-c", "--config", type=str, default="config_files/train_net.yaml"
     )
     return parser.parse_args()
 
@@ -76,7 +76,7 @@ def main(params):
 
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
-    callbacks = [WandbMetricsLogger()]
+    callbacks = [WandbMetricsLogger(monitor='val_loss', mode='min')]
 
     if config['early_stopping']['use']:
         callbacks.append(tf.keras.callbacks.EarlyStopping(
@@ -92,10 +92,9 @@ def main(params):
                         callbacks=callbacks,
                         verbose=1
                         )
-
+    model.load_weights(best_model_path)
     result = model.evaluate(test_dataloader)
     print(result)
-    print(history.history.keys())
 
     plot_metrics_and_losses(history, path=out_dir)
 
