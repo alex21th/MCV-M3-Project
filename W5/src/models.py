@@ -6,14 +6,17 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.layers import Dropout
 import tensorflow as tf
 
+from W5.src.mobilenetv3 import mobile_net_v3_small
 
-def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops: int = 6):
+
+def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops: int = 6, alpha: float = 1.0):
     """
     Get a mobilenet model
     :param model_name: model name
     :param out_dir: output directory
     :param input_size: input size
     :param pops: number of block layers to remove from head
+    :param alpha: width multiplier
     :return: model
     """
     if model_name == 'ft_baseline':
@@ -24,6 +27,8 @@ def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops:
         model = ft_dense_head_dropout(out_dir, input_size)
     elif model_name == 'modified_mobilenet':
         model = modified_mobilenet(out_dir, input_size, pops)
+    elif model_name == "mobilenet_v3":
+        model = mobile_net_v3_small(input_size, alpha=alpha)
     else:
         raise ValueError(f'Unknown model name: {model_name}')
     return model
