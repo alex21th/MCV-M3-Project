@@ -6,7 +6,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.layers import Dropout
 import tensorflow as tf
 
-from W5.src.mobilenetv3 import mobile_net_v3_small
+from src.mobilenetv3 import mobile_net_v3_small
 
 
 def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops: int = 6, alpha: float = 1.0):

@@ -13,7 +13,7 @@ dataloaders:
     channel_shift_range: 0.2
 
 output_path: 'results_ft/'
-epochs: 50
+epochs: 1
 # Training Setting
 optimizer:
   type: sgd

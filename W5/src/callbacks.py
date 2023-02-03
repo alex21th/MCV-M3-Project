@@ -5,6 +5,8 @@ import os
 import tensorflow as tf
 from keras.callbacks import CSVLogger
 
+from wandb.integration.keras import WandbMetricsLogger
+
 
 def get_callbacks(model_path: str, experiment_path: str, es_use: bool = True, es_patience: int = 15) -> List[tf.keras.callbacks.Callback]:
     """This function sets and returns a list of callbacks.
@@ -12,9 +14,10 @@ def get_callbacks(model_path: str, experiment_path: str, es_use: bool = True, es
     :return: List of callbacks
     """
     callbacks = [
+        WandbMetricsLogger(),
         get_model_checkpoint_callback(model_path),
         get_early_stopping(es_use, es_patience),
-        CSVLogger(experiment_path + '/log.csv', append=True, separator=';')
+        # CSVLogger(experiment_path + '/log.csv', append=True, separator=';')
     ]
     return callbacks
 
@@ -49,7 +52,7 @@ def get_early_stopping(use: bool = True, patience: int = 15) -> Union[tf.keras.c
             verbose=0,
             mode="auto",
             baseline=None,
-            restore_best_weights=False,
+            restore_best_weights=True,
         )
         if use
         else None

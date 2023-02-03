@@ -1,15 +1,14 @@
 import os
 from argparse import ArgumentParser
 
-from wandb.integration.keras import WandbMetricsLogger
-
 import wandb
 
 
-from W5.src.dataloader import get_train_dataloader, get_val_dataloader
-from W5.src.models import get_model
-from W5.src.optimizers import get_lr, get_optimizer
-from W5.src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yaml
+from src.dataloader import get_train_dataloader, get_val_dataloader
+from src.models import get_model
+from src.optimizers import get_lr, get_optimizer
+from src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yaml
+from src.callbacks import get_callbacks
 
 import tensorflow as tf
 
@@ -40,11 +39,15 @@ def main(params):
     data_dir = data_config["data_path"]
     inference_batch_size = data_config["inference_batch_size"]
     data_augmentation = data_config["data_augmentation"]
-    out_dir = config["output_path"]
-    os.makedirs(out_dir, exist_ok=True)
+    model_name = model_config['name']
+    output_dir = config["output_path"]
+
+    experiment_path = f"{output_dir}{model_name}"
+    os.makedirs(experiment_path, exist_ok=True)
+    best_model_path = os.path.sep.join([experiment_path, "best-weights.h5"])
 
     run_config = {
-        'model': model_config['name'],
+        'model': model_name,
         "lr_scheduler": lr_schedule_config,
         "optimizer": optimizer_config,
         "batch_size": batch_size,
@@ -54,7 +57,7 @@ def main(params):
 
     wandb.init(project=wandb_config['project'], entity=wandb_config['entity'], config=run_config)
 
-    model = get_model(model_name=model_config['name'], out_dir=out_dir, pops=model_config['pops'])
+    model = get_model(model_name=model_name, out_dir=output_dir, pops=model_config['pops'])
 
     train_dataloader = get_train_dataloader(directory=data_dir, patch_size=input_size,
                                             batch_size=batch_size, data_augmentation=data_augmentation)
@@ -74,9 +77,10 @@ def main(params):
         params=optimizer_config["params"]
     )
 
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy',
+    tf.keras.metrics.TopKCategoricalAccuracy(name='top_5_accuracy', k=5)])
 
-    callbacks = [WandbMetricsLogger(monitor='val_loss', mode='min')]
+    callbacks = get_callbacks(best_model_path, experiment_path, es_use=True, es_patience=15)
 
     if config['early_stopping']['use']:
         callbacks.append(tf.keras.callbacks.EarlyStopping(
@@ -96,7 +100,7 @@ def main(params):
     result = model.evaluate(test_dataloader)
     print(result)
 
-    plot_metrics_and_losses(history, path=out_dir)
+    plot_metrics_and_losses(history, path=output_dir)
 
 
 if __name__ == '__main__':

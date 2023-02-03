@@ -1,7 +1,7 @@
 from keras.preprocessing.image import ImageDataGenerator
-from keras_preprocessing.image import DirectoryIterator
+from keras.preprocessing.image import DirectoryIterator
 
-from W4.src.preprocessing import preprocess_input
+from src.preprocessing import preprocess_input
 
 from typing import Dict
 
