@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple
 
 from keras.layers import Conv2D, DepthwiseConv2D, Dense, GlobalAveragePooling2D
 from keras.layers import Activation, BatchNormalization, Add, Multiply, Reshape
@@ -35,8 +35,8 @@ def return_activation(x: tf.Tensor, nl: str) -> tf.Tensor:
     return x
 
 
-def conv_block(inputs: tf.Tensor, filters: int, kernel: Union[tuple[int, int], int],
-               strides: Union[tuple[int, int], int], nl: str) -> tf.Tensor:
+def conv_block(inputs: tf.Tensor, filters: int, kernel: Union[Tuple[int, int], int],
+               strides: Union[Tuple[int, int], int], nl: str) -> tf.Tensor:
     """
     Convolution Block
     This function defines a 2D convolution operation with BN and activation.
@@ -115,6 +115,27 @@ def bottleneck(inputs, filters, kernel, e, s, squeeze, nl, alpha):
         x = Add()([x, inputs])
 
     return x
+
+
+def _get_shape_value(maybe_v2_shape):
+    """
+    Returns the value of a shape tensor or a scalar.
+    """
+    if maybe_v2_shape is None:
+        return None
+    elif isinstance(maybe_v2_shape, int):
+        return maybe_v2_shape
+    else:
+        return maybe_v2_shape.value
+
+
+def _split_channels(total_filters, num_groups):
+    """
+    Splits the filters into groups.
+    """
+    split = [total_filters // num_groups for _ in range(num_groups)]
+    split[0] += total_filters - sum(split)
+    return split
 
 
 def mix_conv(
@@ -240,6 +261,7 @@ def mobile_net_v3_small(input_shape: int, output_shape: int = 8, alpha: float = 
 
     model.summary()
     return model
+
 
 def mobile_net_v3_small_mix_convs(input_shape: int, output_shape: int = 8, alpha: float = 1.0) -> Model:
     """
