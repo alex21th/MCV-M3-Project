@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import wandb
 
 
-from src.dataloader import get_train_dataloader, get_val_dataloader
+from src.dataloader import get_train_dataloader, get_val_dataloader, get_test_dataloader
 from src.models import get_model
 from src.optimizers import get_lr, get_optimizer
 from src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yaml
@@ -63,7 +63,7 @@ def main(params):
                                             batch_size=batch_size, data_augmentation=data_augmentation)
     validation_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size,
                                                batch_size=batch_size)
-    test_dataloader = get_val_dataloader(directory=data_dir, patch_size=input_size, batch_size=inference_batch_size)
+    test_dataloader = get_test_dataloader(directory=data_dir, patch_size=input_size)
 
     lr = get_lr(
         lr_decay_scheduler_name=lr_schedule_config["type"],

@@ -11,7 +11,7 @@ from src.mobilenetv3 import mobile_net_v3_small
 from W5.src.mobilenetv3 import mobile_net_v3_small_mix_convs
 
 
-def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops: int = 6, alpha: float = 1.0):
+def get_model(model_name: str, out_dir: str = None, input_size: int = 256, pops: int = 6, alpha: float = 1.0):
     """
     Get a mobilenet model
     :param model_name: model name

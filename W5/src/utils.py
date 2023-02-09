@@ -33,7 +33,7 @@ def plot_metrics_and_losses(history, path: str):
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig(path + 'accuracy.jpg')
+    plt.savefig(path + '/accuracy.jpg')
     plt.close()
 
     # summarize history for loss
@@ -43,7 +43,7 @@ def plot_metrics_and_losses(history, path: str):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig(path + 'loss.jpg')
+    plt.savefig(path + '/loss.jpg')
     plt.close()
 
 

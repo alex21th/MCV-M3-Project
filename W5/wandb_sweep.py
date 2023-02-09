@@ -1,13 +1,17 @@
 from argparse import ArgumentParser
 from typing import Dict
 
+import numpy as np
+from sklearn.metrics import confusion_matrix
+
 import wandb
 from wandb.keras import WandbMetricsLogger
 
-from W5.src.dataloader import get_train_dataloader, get_val_dataloader
+from W5.src.callbacks import get_model_checkpoint_callback
+from W5.src.dataloader import get_train_dataloader, get_val_dataloader, get_test_dataloader
 from W5.src.models import get_model
 from W5.src.optimizers import get_lr, get_optimizer
-from W5.src.utils import prepare_gpu, load_config_from_yaml
+from W5.src.utils import prepare_gpu, load_config_from_yaml, plot_metrics_and_losses
 
 import tensorflow as tf
 
@@ -79,15 +83,33 @@ def train_loop(config: Dict = None):
                 monitor='val_loss',
                 patience=early_stop_config['patience']
             ))
+        callbacks.append(get_model_checkpoint_callback(log_dir=wandb.run.dir + '/best_model.h5'))
+        history = model.fit(train_dataloader,
+                            steps_per_epoch=len(train_dataloader),
+                            epochs=epochs,
+                            validation_data=validation_dataloader,
+                            validation_steps=len(validation_dataloader),
+                            callbacks=callbacks,
+                            verbose=1
+                            )
 
-        model.fit(train_dataloader,
-                  steps_per_epoch=len(train_dataloader),
-                  epochs=epochs,
-                  validation_data=validation_dataloader,
-                  validation_steps=len(validation_dataloader),
-                  callbacks=callbacks,
-                  verbose=1
-                  )
+        test_dataloader = get_test_dataloader(directory=DATA_DIR, patch_size=INPUT_SIZE)
+
+        model.load_weights(wandb.run.dir + '/best_model.h5')
+        result = model.evaluate(test_dataloader)
+        wandb.log({"test_loss": result[0], "test_accuracy": result[1]})
+        print(result)
+
+        test_predictions = model.predict(test_dataloader)
+        top_pred_ids = test_predictions.argmax(axis=1)
+        wandb.log({"Test Confusion Matrix": wandb.plot.confusion_matrix(
+            preds=top_pred_ids, y_true=test_dataloader.labels,
+            class_names=list(test_dataloader.class_indices.keys()))})
+
+        wandb.log({"pr": wandb.plot.pr_curve(test_dataloader.labels, test_predictions,
+                                             labels=list(test_dataloader.class_indices.keys()))})
+        wandb.log({"roc": wandb.plot.roc_curve(test_dataloader.labels, test_predictions,
+                                               labels=list(test_dataloader.class_indices.keys()))})
 
 
 if __name__ == '__main__':

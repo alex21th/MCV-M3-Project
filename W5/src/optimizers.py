@@ -20,9 +20,9 @@ def get_optimizer(optimizer_name: str,
                                             momentum=params['momentum'], nesterov=True,
                                             decay=params['weight_decay'])
     elif optimizer_name == 'adam':
-        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, decay=params['weight_decay'])
     elif optimizer_name == 'adamax':
-        optimizer = tf.keras.optimizers.Adamax(learning_rate=learning_rate)
+        optimizer = tf.keras.optimizers.Adamax(learning_rate=learning_rate, decay=params['weight_decay'])
     elif optimizer_name == 'nadam':
         optimizer = tf.keras.optimizers.Nadam(learning_rate=learning_rate)
     else:
