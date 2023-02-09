@@ -14,6 +14,7 @@ from W5.src.optimizers import get_lr, get_optimizer
 from W5.src.utils import prepare_gpu, load_config_from_yaml, plot_metrics_and_losses
 
 import tensorflow as tf
+from tensorflow.keras.metrics import TopKCategoricalAccuracy
 
 
 def nested_dict(original_dict):
@@ -74,7 +75,8 @@ def train_loop(config: Dict = None):
             params=optimizer_config["params"]
         )
 
-        model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer=optimizer,
+                      metrics=['accuracy', TopKCategoricalAccuracy(name='top_2_accuracy', k=2)])
 
         callbacks = [WandbMetricsLogger()]
 

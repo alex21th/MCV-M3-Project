@@ -11,6 +11,7 @@ from src.utils import prepare_gpu, plot_metrics_and_losses, load_config_from_yam
 from src.callbacks import get_callbacks
 
 import tensorflow as tf
+from tensorflow.keras.metrics import TopKCategoricalAccuracy
 
 
 def parse_args():
@@ -78,7 +79,7 @@ def main(params):
     )
 
     model.compile(loss='categorical_crossentropy', optimizer=optimizer,
-                  metrics=['accuracy', tf.keras.metrics.TopKCategoricalAccuracy(name='top_5_accuracy', k=2)])
+                  metrics=['accuracy', TopKCategoricalAccuracy(name='top_2_accuracy', k=2)])
 
     callbacks = get_callbacks(best_model_path, experiment_path, early_stop_config)
 
