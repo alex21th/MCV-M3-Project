@@ -21,6 +21,10 @@ def get_optimizer(optimizer_name: str,
                                             decay=params['weight_decay'])
     elif optimizer_name == 'adam':
         optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    elif optimizer_name == 'adamax':
+        optimizer = tf.keras.optimizers.Adamax(learning_rate=learning_rate)
+    elif optimizer_name == 'nadam':
+        optimizer = tf.keras.optimizers.Nadam(learning_rate=learning_rate)
     else:
         raise ValueError('Optimizer name not recognized.')
     return optimizer

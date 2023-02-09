@@ -77,16 +77,10 @@ def main(params):
         params=optimizer_config["params"]
     )
 
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy',
-    tf.keras.metrics.TopKCategoricalAccuracy(name='top_5_accuracy', k=5)])
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer,
+                  metrics=['accuracy', tf.keras.metrics.TopKCategoricalAccuracy(name='top_5_accuracy', k=2)])
 
-    callbacks = get_callbacks(best_model_path, experiment_path, es_use=True, es_patience=15)
-
-    if config['early_stopping']['use']:
-        callbacks.append(tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss',
-            patience=config['early_stopping']['patience']
-        ))
+    callbacks = get_callbacks(best_model_path, experiment_path, early_stop_config)
 
     history = model.fit(train_dataloader,
                         steps_per_epoch=len(train_dataloader),

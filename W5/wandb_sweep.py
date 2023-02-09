@@ -4,10 +4,10 @@ from typing import Dict
 import wandb
 from wandb.keras import WandbMetricsLogger
 
-from W4.src.dataloader import get_train_dataloader, get_val_dataloader
-from W4.src.models import get_model
-from W4.src.optimizers import get_lr, get_optimizer
-from W4.src.utils import prepare_gpu, load_config_from_yaml
+from W5.src.dataloader import get_train_dataloader, get_val_dataloader
+from W5.src.models import get_model
+from W5.src.optimizers import get_lr, get_optimizer
+from W5.src.utils import prepare_gpu, load_config_from_yaml
 
 import tensorflow as tf
 
@@ -28,9 +28,9 @@ def nested_dict(original_dict):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        "-c", "--config", type=str, default="config_files/fine_tuning.yaml")
+        "-c", "--config", type=str, default="config_files/train_net.yaml")
     parser.add_argument(
-        "-sc", "--sweep_config", type=str, default="config_files/wandb_sweep_task_4.yaml")
+        "-sc", "--sweep_config", type=str, default="config_files/sweep_mobilenetv3.yaml")
     return parser.parse_args()
 
 
@@ -49,8 +49,9 @@ def train_loop(config: Dict = None):
         data_augmentation = data_config["data_augmentation"]
         epochs = config['epochs']
         early_stop_config = config["early_stopping"]
+        model_config = config['model']
 
-        model = get_model(model_name=config['model'], pops=config['pops'])
+        model = get_model(model_name=model_config['name'], pops=model_config['pops'])
 
         train_dataloader = get_train_dataloader(directory=DATA_DIR, patch_size=INPUT_SIZE,
                                                 batch_size=batch_size, data_augmentation=data_augmentation)
@@ -96,5 +97,5 @@ if __name__ == '__main__':
     DATA_DIR = g_config['data_path']
     INPUT_SIZE = g_config['input_size']
     sweep_config = load_config_from_yaml(args.sweep_config)
-    sweep_id = wandb.sweep(sweep_config, project="task_4_sweep")
+    sweep_id = wandb.sweep(sweep_config, project="sweep_mobilenetv3_mixconvs")
     wandb.agent(sweep_id, train_loop, count=50)

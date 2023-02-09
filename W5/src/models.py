@@ -8,6 +8,8 @@ import tensorflow as tf
 
 from src.mobilenetv3 import mobile_net_v3_small
 
+from W5.src.mobilenetv3 import mobile_net_v3_small_mix_convs
+
 
 def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops: int = 6, alpha: float = 1.0):
     """
@@ -29,6 +31,8 @@ def get_model(model_name: str, out_dir: str = None, input_size: int = 224, pops:
         model = modified_mobilenet(out_dir, input_size, pops)
     elif model_name == "mobilenet_v3":
         model = mobile_net_v3_small(input_size, alpha=alpha)
+    elif model_name == "mobilenet_v3_mixconvs":
+        model = mobile_net_v3_small_mix_convs(input_size, alpha=alpha)
     else:
         raise ValueError(f'Unknown model name: {model_name}')
     return model

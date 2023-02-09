@@ -1,5 +1,5 @@
 dataloaders:
-  data_path: '../data/MIT_small_train_4/'
+  data_path: '../data/MIT_small_train_1/'
   input_size: 256
   batch_size: 8
   inference_batch_size: 1
@@ -13,17 +13,17 @@ dataloaders:
     channel_shift_range: 0.2
 
 output_path: 'results_ft/'
-epochs: 1
+epochs: 100
 # Training Setting
 optimizer:
-  type: sgd
+  type: nadam
   params:
     momentum: 0.9
-    weight_decay: 0.0001
+    weight_decay: 0.0003
 
 model:
-  name: 'mobilenet_v3'
-  pops: 6
+  name: 'mobilenet_v3_mixconvs'
+  pops: 0
 
 
 # Callbacks Settings
@@ -35,11 +35,10 @@ wandb:
 lr_scheduler:
   type: constant
   params:
-    base_lr: 0.001
-    decay_rate: 0.2
-    drop_every: 5
-
+    base_lr: 0.0003
+    decay_rate: 0.25
+    drop_every: 10
 
 early_stopping:
-  use: True
-  patience: 15
+  use: False
+  patience: 1

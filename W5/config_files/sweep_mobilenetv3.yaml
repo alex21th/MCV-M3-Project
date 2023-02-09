@@ -1,0 +1,65 @@
+method: bayes
+metric:
+  name: epoch/val_loss
+  goal: minimize
+parameters:
+  model:
+    parameters:
+      name:
+        value: mobilenet_v3_mixconvs
+      pops:
+        value: 0
+  epochs:
+    value: 200
+  optimizer:
+    parameters:
+      type:
+        values: [sgd, adam, adamax]
+      params:
+        parameters:
+          momentum:
+            value: 0.9
+          weight_decay:
+            distribution: uniform
+            min: 0.000005
+            max: 0.0002
+  batch_size:
+    value: 8
+  lr_scheduler:
+    parameters:
+      type:
+        values: [ step ]
+      params:
+        parameters:
+          base_lr:
+            values: [0.01,  0.005, 0.001, 0.0001, 0.0003]
+          decay_rate:
+              distribution: uniform
+              min: 0.1
+              max: 0.5
+          drop_every:
+            values: [5, 10, 15, 20, 25]
+  early_stopping:
+    parameters:
+      use:
+        value: False
+      patience:
+        value: 15
+  dataloaders:
+    parameters:
+      data_augmentation:
+        parameters:
+          use:
+            value: True
+          rotation_range:
+            value: 10
+          width_shift_range:
+            value: 0.2
+          height_shift_range:
+            value: 0.2
+          shear_range:
+            value: 0.2
+          zoom_range:
+            value: 0.1
+          channel_shift_range:
+            value: 0.1
