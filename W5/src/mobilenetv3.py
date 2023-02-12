@@ -279,24 +279,24 @@ def mobile_net_v3_small_mix_convs(input_shape: int, output_shape: int = 8, alpha
 
     kernels = [(3, 3), (5, 5), (7, 7), (9, 9)]
 
-    x = mix_conv_bottleneck(x, 16, kernels, e=16, s=2, squeeze=True, nl='RE', alpha=alpha)
+    x = mix_conv_bottleneck(x, 16, kernels, e=16, s=2, squeeze=False, nl='RE', alpha=alpha)
     x = mix_conv_bottleneck(x, 24, kernels, e=72, s=2, squeeze=False, nl='RE', alpha=alpha)
     x = mix_conv_bottleneck(x, 24, kernels, e=88, s=1, squeeze=False, nl='RE', alpha=alpha)
-    x = mix_conv_bottleneck(x, 40, kernels, e=96, s=2, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 40, kernels, e=240, s=1, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 40, kernels, e=240, s=1, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 48, kernels, e=120, s=1, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 48, kernels, e=144, s=1, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 96, kernels, e=288, s=2, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 96, kernels, e=576, s=1, squeeze=True, nl='HS', alpha=alpha)
-    x = mix_conv_bottleneck(x, 96, kernels, e=576, s=1, squeeze=True, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 40, kernels, e=96, s=2, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 40, kernels, e=240, s=1, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 40, kernels, e=240, s=1, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 48, kernels, e=120, s=1, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 48, kernels, e=144, s=1, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 96, kernels, e=288, s=2, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 96, kernels, e=576, s=1, squeeze=False, nl='HS', alpha=alpha)
+    x = mix_conv_bottleneck(x, 96, kernels, e=576, s=1, squeeze=False, nl='HS', alpha=alpha)
 
     x = conv_block(x, 576, (1, 1), strides=(1, 1), nl='HS')
     x = GlobalAveragePooling2D()(x)
     x = Reshape((1, 1, 576))(x)
 
-    x = Conv2D(1280, (1, 1), padding='same')(x)
-    x = return_activation(x, 'HS')
+    # x = Conv2D(1280, (1, 1), padding='same')(x)
+    # x = return_activation(x, 'HS')
 
     x = Conv2D(output_shape, (1, 1), padding='same', activation='softmax')(x)
     x = Reshape((output_shape,))(x)

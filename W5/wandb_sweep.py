@@ -1,8 +1,6 @@
 from argparse import ArgumentParser
 from typing import Dict
 
-import numpy as np
-from sklearn.metrics import confusion_matrix
 
 import wandb
 from wandb.keras import WandbMetricsLogger
@@ -11,8 +9,7 @@ from W5.src.callbacks import get_model_checkpoint_callback
 from W5.src.dataloader import get_train_dataloader, get_val_dataloader, get_test_dataloader
 from W5.src.models import get_model
 from W5.src.optimizers import get_lr, get_optimizer
-from W5.src.utils import prepare_gpu, load_config_from_yaml, plot_metrics_and_losses
-
+from W5.src.utils import prepare_gpu, load_config_from_yaml
 import tensorflow as tf
 from tensorflow.keras.metrics import TopKCategoricalAccuracy
 
@@ -85,7 +82,7 @@ def train_loop(config: Dict = None):
                 monitor='val_loss',
                 patience=early_stop_config['patience']
             ))
-        callbacks.append(get_model_checkpoint_callback(log_dir=wandb.run.dir + '/best_model.h5'))
+        callbacks.append(get_model_checkpoint_callback(log_dir=wandb.run.dir + '/best_tiny.h5'))
         history = model.fit(train_dataloader,
                             steps_per_epoch=len(train_dataloader),
                             epochs=epochs,
@@ -97,7 +94,7 @@ def train_loop(config: Dict = None):
 
         test_dataloader = get_test_dataloader(directory=DATA_DIR, patch_size=INPUT_SIZE)
 
-        model.load_weights(wandb.run.dir + '/best_model.h5')
+        model.load_weights(wandb.run.dir + '/best_tiny.h5')
         result = model.evaluate(test_dataloader)
         wandb.log({"test_loss": result[0], "test_accuracy": result[1]})
         print(result)
@@ -120,6 +117,4 @@ if __name__ == '__main__':
     g_config = load_config_from_yaml(args.config)['dataloaders']
     DATA_DIR = g_config['data_path']
     INPUT_SIZE = g_config['input_size']
-    sweep_config = load_config_from_yaml(args.sweep_config)
-    sweep_id = wandb.sweep(sweep_config, project="sweep_mobilenetv3_mixconvs")
-    wandb.agent(sweep_id, train_loop, count=50)
+    wandb.agent("mcv-m3-g6/sweep_mobilenetv3_mixconvs_tiny/elnzoe9f", train_loop, count=50)
